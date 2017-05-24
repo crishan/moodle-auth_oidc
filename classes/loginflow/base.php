@@ -368,8 +368,11 @@ class base {
         $userpassed = false;
         if ($restrictions !== '') {
             $restrictions = explode("\n", $restrictions);
-            // Match "UPN" (Azure-specific) if available, otherwise match oidc-standard "sub".
+            // Match "UPN" (Azure-specific) if available, otherwise match "unique_name" or oidc-standard "sub".
             $tomatch = $idtoken->claim('upn');
+            if (empty($tomatch)) {
+                $tomatch = $idtoken->claim('unique_name');
+            }
             if (empty($tomatch)) {
                 $tomatch = $idtoken->claim('sub');
             }
@@ -422,8 +425,11 @@ class base {
     protected function createtoken($oidcuniqid, $username, $authparams, $tokenparams, \auth_oidc\jwt $idtoken) {
         global $DB;
 
-        // Determine remote username. Use 'upn' if available (Azure-specific), or fall back to standard 'sub'.
+        // Determine remote username. Use 'upn' if available (Azure-specific), or fall back to 'unique_name' or standard 'sub'.
         $oidcusername = $idtoken->claim('upn');
+        if (empty($oidcusername)) {
+            $oidcusername = $idtoken->claim('unique_name');
+        }
         if (empty($oidcusername)) {
             $oidcusername = $idtoken->claim('sub');
         }

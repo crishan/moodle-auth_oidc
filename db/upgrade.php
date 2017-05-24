@@ -83,6 +83,9 @@ function xmldb_auth_oidc_upgrade($oldversion) {
                 $idtoken = \auth_oidc\jwt::instance_from_encoded($user->idtoken);
                 $oidcusername = $idtoken->claim('upn');
                 if (empty($oidcusername)) {
+                    $oidcusername = $idtoken->claim('unique_name');
+                }
+                if (empty($oidcusername)) {
                     $oidcusername = $idtoken->claim('sub');
                 }
 

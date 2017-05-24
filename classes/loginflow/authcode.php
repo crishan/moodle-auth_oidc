@@ -389,8 +389,11 @@ class authcode extends \auth_oidc\loginflow\base {
             $username = $tokenrec->username;
             $this->updatetoken($tokenrec->id, $authparams, $tokenparams);
         } else {
-            // Use 'upn' if available for username (Azure-specific), or fall back to lower-case oidcuniqid.
+            // Use 'upn' if available for username (Azure-specific), or fall back to 'unique_name' or lower-case oidcuniqid.
             $username = $idtoken->claim('upn');
+            if (empty($username)) {
+                $username = $idtoken->claim('unique_name');
+            }
             if (empty($username)) {
                 $username = $oidcuniqid;
             }
